@@ -1,17 +1,36 @@
 # Polybar Spotify Module
 
-![polybar-spotify-module](https://github.com/mihirlad55/polybar-spotify-module/raw/master/screenshots/capture2.png)
+![polybar-spotify-module](https://github.com/corigne/polybar-spotify-module/raw/main/screenshots/capture2.png)
 
-This is a pure C implementation of an external polybar module that signals
-polybar when a track is playing/paused and when the track changes. There is
-also a program that retreives the title and artist of the currently playing
-song on spotify.
+This is a fork of [mihirlad55/polybar-spotify-module](https://github.com/mihirlad55/polybar-spotify-module/)
+which addresses breaking changes introduced by polybar updates 3.6 onward.
 
+The service/daemon (depending on how you choose to run it) signals polybar via
+specific polybar-msg calls to trigger hooks in the module on service start and
+when a song is played, paused, or changed. There is also a program that 
+retrieves the title and artist of the currently playing song on spotify.
+
+Originally, I created this fork to address breaking changes from polybar in 
+versions 3.6 and 3.7, which deprecated direct IPC pipe writes and changed IPC 
+module configurations, respectively.
+
+I have also added some minor features to the spotify-listener daemon.
+Now the daemon checks for a running instance of spotify when the daemon launches 
+or when spotify first launches after the daemon is started.
+The daemon will update the polybar module immediately instead of updating on the 
+first instance when the user presses 'play' or 'next/previous' in the app. 
+This is accomplished with glib2/gio instead of raw dbus access, for brevity.
+
+I will continue to at a minimum maintain this fork against future polybar 
+updates until one of the maintainers has a chance to review for merge,
+or indefinitely in the event that never happens.
 
 ## Requirements
-DBus is used for listening to spotify track changes. Obviously you need spotify
-and polybar as well:
-`dbus polybar spotify`
+DBus and glib2, a library which provides some modern types and bindings for dbus,
+are used for listening to spotify track changes and when spotify starts/stops.
+Obviously you need spotify and polybar as well:
+
+`dbus glib2 polybar spotify`
 
 To compile the program, you will need `make`.
 
@@ -19,25 +38,16 @@ You most likely already have the above packages installed. Systemd depends on
 DBus, and you wouldn't be looking at this, if you didn't have polybar and
 spotify installed.
 
-
-## How to Setup
+## How to Set Up
 
 ### Installing the Program
 Run the following code to clone the repo and install the programs.
 ```
-git clone https://github.com/mihirlad55/polybar-spotify-module
+git clone https://github.com/corigne/polybar-spotify-module
 cd polybar-spotify-module/src/
 sudo make install
 ```
-
-#### Arch Linux Users
-`polybar-spotify-module` exists as a package on the AUR! Use your favourite
-AUR helper to install the package.
-```
-yay -S polybar-spotify-module
-```
-The package can be found here
-<https://aur.archlinux.org/packages/polybar-spotify-module/>.
+Uninstall using `sudo make uninstall` from the src directory.
 
 ### Running spotify-listener in the Background
 `spotify-listener` must run in the background for it to be able to listen for
@@ -184,24 +194,14 @@ retreive status information and calls methods in the
 `org.mpris.MediaPlayer2.Player` interface to pause/play and go to the
 previous/next track.
 
-
-## Why Did I Make this in C
-- Practice/learn low-level C
-- Reduce number of dependencies
-- Make something as lightweight as possible by directly interfacing with DBus
-- For fun 😜
-
-
-## Resources
-The following are very useful resources for DBus API and specs:
-
-- <https://dbus.freedesktop.org/doc/api/html/group__DBusConnection.html>
-- <https://dbus.freedesktop.org/doc/api/html/group__DBusBus.html>
-- <https://dbus.freedesktop.org/doc/api/html/group__DBusMessage.html>
-- <https://dbus.freedesktop.org/doc/dbus-specification.html>
-- <https://dbus.freedesktop.org/doc/dbus-tutorial.html>
-
+Glib interface bindings are created to query the mpris2 interface on both
+service launch and when state changes are detected to get the current status 
+of spotify.
 
 ## Credits
-Inspired by the python implementation by
-[dietervanhoof](https://github.com/dietervanhoof): <https://github.com/dietervanhoof/polybar-spotify-controls>
+
+[mihirlad55](https://github.com/mihirlad55): <https://github.com/mihirlad55/polybar-spotify-module>
+Many thanks to @mihirlad55 for his work on the original module.
+I enjoy the module immensely, and I use it on all of my systems!
+I intend this project as a respectful contribution to mihirlad55's original work,
+which helped me understand dbus better and encouraged me to start my own projects.
