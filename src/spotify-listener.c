@@ -311,12 +311,14 @@ DBusHandlerResult name_owner_changed_handler(DBusConnection *connection,
     }
 
     // If name matches spotify and new owner is "", spotify disconnected
-    if (strcmp(name, "org.mpris.MediaPlayer2.spotify") == 0 &&
-        strcmp(old_owner, "") == 0) {
+    else if (strcmp(name, "org.mpris.MediaPlayer2.spotify") == 0 &&
+        strcmp(old_owner, "org.mpris.MediaPlayer2.spotify") != 0) {
 
       puts("Spotify CONNECTED");
       // dbus new_owner is sender_id
       spotify_update_sender(new_owner);
+
+      usleep(7500);
 
       is_spotify = get_spotify_status();
       if (is_spotify) {
