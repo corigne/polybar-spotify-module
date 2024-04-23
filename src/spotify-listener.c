@@ -318,7 +318,7 @@ DBusHandlerResult name_owner_changed_handler(DBusConnection *connection,
       // dbus new_owner is sender_id
       spotify_update_sender(new_owner);
 
-      usleep(7500);
+      msleep(1250);
 
       is_spotify = get_spotify_status();
       if (is_spotify) {
